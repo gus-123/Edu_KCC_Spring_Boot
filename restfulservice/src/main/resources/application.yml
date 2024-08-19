@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+#스프링 프레임워크의 흐름도를 볼수 있게 하는 코드
+#logging:
+#  level:
+#    org.springframework: DEBUG
+
+spring:
+  messages:
+    basename: messages
