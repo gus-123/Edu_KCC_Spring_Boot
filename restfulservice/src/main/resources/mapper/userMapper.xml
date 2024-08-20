@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kcc.restfulservice.mapper.UserMapper">
+
+    <!--   <select id="findAllUsers" resultType="User">-->
+    <!--        select * from users-->
+    <!--   </select>-->
+    <resultMap id="userMap" type="User">
+        <id property="id" column="u_id"/>
+        <result property="name" column="name"/>
+        <result property="joinDate" column="joinDate"/>
+        <result property="password" column="password"/>
+        <result property="ssn" column="ssn"/>
+        <collection property="posts" resultMap="postMap"/> <!-- User 객체의 posts 프로퍼티는 List<Post> 형태로 여러 개의 Post 객체를 담을 수 있음 -->
+    </resultMap>
+
+    <!-- postMap에 정의된 대로 하나의 Post 객체로 매핑-->
+    <resultMap id="postMap" type="Post">
+        <result property="id" column="p_id"/>
+        <result property="description" column="description"/>
+        <result property="user_id" column="user_id"/>
+    </resultMap>
+
+    <select id="findAllUsers" resultMap="userMap">  <!-- resultMap이 있으면 resulType있으면 안되 -->
+        select u.id as u_id, name, joinDate, password, ssn,
+            p.id as p_id, description, user_id
+        from users u LEFT OUTER JOIN post p ON u.id = p.user_id
+    </select>
+
+    <select id="findUser" resultType="User">
+        select *
+        from users
+        where id = #{id}
+    </select>
+
+    <insert id="createUser" parameterType="User">
+        insert into users(id, name, joinDate, password, ssn)
+        values (user_seq.nextval, #{name}, sysdate, #{password}, #{ssn})
+    </insert>
+
+    <insert id="createPost" parameterType="Post">
+        insert into post(id, description, user_id)
+        values (post_seq.nextval, #{description}, #{user_id})
+    </insert>
+
+</mapper>
+
+
+
+

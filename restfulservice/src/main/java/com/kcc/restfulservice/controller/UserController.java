@@ -1,8 +1,10 @@
 package com.kcc.restfulservice.controller;
 
+import com.kcc.restfulservice.bean.Post;
 import com.kcc.restfulservice.bean.User;
 import com.kcc.restfulservice.exception.UserNotFoundException;
 import com.kcc.restfulservice.service.UserDaoService;
+import com.kcc.restfulservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.apache.coyote.Response;
@@ -25,10 +27,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserController {
 
     //@Autowired - 2번 방식
-    private UserDaoService service;
+    private UserService service;
 
     // 3번 방식
-    public UserController(UserDaoService service) {
+    public UserController(UserService service) {
         this.service = service;
     }
 
@@ -50,6 +52,7 @@ public class UserController {
         EntityModel entityModel =  EntityModel.of(user);
 
         // WebMvcLinkBuilder를 static으로 넣으면 linkTo를 import할 필요가 없다.
+        // retrieveAllUsers을 첨부해서 all-users라는 형태로 보내 줌.
         WebMvcLinkBuilder linkTo = WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).retrieveAllUsers());
         entityModel.add(linkTo.withRel("all-users"));
 
@@ -82,12 +85,32 @@ public class UserController {
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable int id) {
-        User user = service.deleteById(id);
-
-        if(user == null) {
-            throw new UserNotFoundException(String.format("ID[%s] not found",id));
-        }
+    // http://localhost:8081/users/1/posts
+    /*
+    {
+    "description": "second post",
+    "user_id":1
     }
+     */
+    @PostMapping("/users/{id}/posts")
+    public ResponseEntity<Post> createPost(@PathVariable int id, @RequestBody Post post) {
+        post.setUser_id(id); //user_id를 url에서 가져와 해당하는 user_id에 post_id를 자동으로 넣어줌.
+
+        service.savePost(post);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(post.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
+//    @DeleteMapping("/users/{id}")
+//    public void deleteUser(@PathVariable int id) {
+//        User user = service.deleteById(id);
+//
+//        if(user == null) {
+//            throw new UserNotFoundException(String.format("ID[%s] not found",id));
+//        }
+//    }
 }

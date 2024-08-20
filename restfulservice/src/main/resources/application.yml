@@ -1,3 +1,4 @@
+# 애플리케이션이 8081 포트에서 실행
 server:
   port: 8081
 
@@ -6,6 +7,43 @@ server:
 #  level:
 #    org.springframework: DEBUG
 
+## JPA일때 사용하는 코드
+#spring:
+#  messages: # 메시지 파일의 기본 이름을 messages로 설정
+#    basename: messages # 다국어 지원 등을 위한 메시지 처리가 가능 // @Valid를 위해 사용.
+#  # connectionPool 생성
+#  datasource: # 데이터베이스 연결 정보를 설정
+#    url: jdbc:h2:mem:testdb # 데이터베이스 URL
+#    username: sa # 사용자 이름
+#  jpa:
+#    hibernate:
+#      ddl-auto: create-drop # 데이터베이스 스키마 생성/변경 방식을 설정(애플리케이션 시작 시 테이블을 생성하고 종료 시 삭제하도록 설정)
+#    show-sql: true #  SQL 쿼리를 콘솔에 출력할지 여부를 설정
+#    defer-datasource-initialization: true # 데이터소스 초기화 시기를 지연
+#  h2:
+#    console: # H2 데이터베이스 콘솔 설정
+#      enabled: true # 콘솔 활성화 여부
+#      # web에서 접근 허용
+#      settings:
+#        web-allow-others: true
+
+
+
+# mybatis일때 사용하는 코드
 spring:
   messages:
     basename: messages
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521:XE
+    username: kcc
+    password: 1234
+
+  mvc:  # view로 JSP를 위해 추가
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.kcc.restfulservice.bean
